@@ -12,11 +12,13 @@ namespace Advent_Of_Code_2023
         static void Main(string[] args)
         {
             string command;
+            string[] commandArgs = { };
             Console.WriteLine("Welcome to the Advent of Code 2023 CLI!\n\n");
             bool isQuitting = false;
             while (!isQuitting)
             {
                 command = Console.ReadLine();
+
                 switch (command)
                 {
                     case "/help":
@@ -44,6 +46,36 @@ namespace Advent_Of_Code_2023
         {
             Console.WriteLine("\nCalibrating...\n");
             int checkSum = 0;
+
+            //Step 1: Open Filestream
+            using (var fs = File.OpenRead(fileName))
+            {
+                using (var reader = new StreamReader(fs))
+                {
+                    //Step 2: Parse lines for integers (possibly separate by char);
+                    //        first and last ints form a 2-digit int, if there's only one it forms a 2-digit int on its own, ignore lines with no ints;
+                    //        each 2-digit int is added to a running sum called checkSum
+                    while (!reader.EndOfStream)
+                    {
+                        string currentLine = reader.ReadLine();
+                        List<char> digits = FindAllDigits(currentLine);
+                        if (digits.Count == 0)
+                            continue;
+
+                        string numberString = digits[0].ToString() + digits[digits.Count - 1].ToString();
+                        int currentNumber = int.Parse(numberString);
+                        Console.WriteLine($"Line: {currentLine}\nNumber String: {numberString}\nInteger: {currentNumber}\n");
+                        checkSum += currentNumber;
+                        digits.Clear();
+                    }
+                }
+            }
+            //Step 3: Return the CheckSum
+            return checkSum;
+        }
+
+        static private List<char> FindAllDigits(string currentLine)
+        {
             var wordToDigit = new Dictionary<string, char>
             {
                 {"zero", '0'},
@@ -57,86 +89,82 @@ namespace Advent_Of_Code_2023
                 {"eight", '8'},
                 {"nine", '9'}
             };
-            //Step 1: Open Filestream
-            using (var fs = File.OpenRead(fileName))
+            string word = "";
+            List<char> digits = new List<char>();
+
+            //Check for first occurence of a digit or digit word forwards and backwards
+            for (int i = 0; i < currentLine.Length; i++)
             {
-                using (var reader = new StreamReader(fs))
+                if (char.IsDigit(currentLine[i]))
                 {
-                    //Step 2: Parse lines for integers (possibly separate by char);
-                    //        first and last ints form a 2-digit int, if there's only one it forms a 2-digit int on its own, ignore lines with no ints;
-                    //        each 2-digit int is added to a running sum called checkSum
-                    while (!reader.EndOfStream)
-                    {
-                        string currentLine = reader.ReadLine();
-                        string word = "";
-                        List<char> digits = new List<char>();
-                        digits.Clear();
-
-                        //Check for first occurence of a digit or digit word forwards and backwards
-                        for (int i = 0; i < currentLine.Length; i++)
-                        {
-                            if (char.IsDigit(currentLine[i]))
-                            {
-                                word = "";
-                                digits.Add(currentLine[i]);
-                                break;
-                            }
-                            else
-                            {
-                                bool wordFound = false;
-                                word += currentLine[i].ToString();
-                                foreach (string key in wordToDigit.Keys)
-                                {
-                                    if (!word.Contains(key))
-                                        continue;
-                                    wordFound = true;
-                                    char value = wordToDigit[key];
-                                    digits.Add(value);
-                                    break;
-                                }
-                                if (wordFound)
-                                    break;
-                            }  
-                        }
-                        word = "";
-                        for (int i = currentLine.Length-1; i > 0; i--)
-                        {
-                            if (char.IsDigit(currentLine[i]))
-                            {
-                                word = "";
-                                digits.Add(currentLine[i]);
-                                break;
-                            }
-                            else
-                            {
-                                bool wordFound = false;
-                                word = currentLine[i].ToString() + word;
-                                foreach (string key in wordToDigit.Keys)
-                                {
-                                    if (!word.Contains(key))
-                                        continue;
-                                    wordFound = true;
-                                    char value = wordToDigit[key];
-                                    digits.Add(value);
-                                    break;
-                                }
-                                if (wordFound)
-                                    break;
-                            }
-                        }
-                        
-                        if (digits.Count == 0)
-                            continue;
-                        string numberString = digits[0].ToString() + digits[digits.Count - 1].ToString();
-                        int currentNumber = int.Parse(numberString);
-                        Console.WriteLine($"Line: {currentLine}\nNumber String: {numberString}\nInteger: {currentNumber}\n");
-                        checkSum += currentNumber;
-                    }
+                    word = "";
+                    digits.Add(currentLine[i]);
+                    break;
                 }
-
+                else
+                {
+                    bool wordFound = false;
+                    word += currentLine[i].ToString();
+                    foreach (string key in wordToDigit.Keys)
+                    {
+                        if (!word.Contains(key))
+                            continue;
+                        wordFound = true;
+                        char value = wordToDigit[key];
+                        digits.Add(value);
+                        break;
+                    }
+                    if (wordFound)
+                        break;
+                }
             }
-            //Step 3: Return the CheckSum
-            return checkSum;
+            word = "";
+            for (int i = currentLine.Length - 1; i > 0; i--)
+            {
+                if (char.IsDigit(currentLine[i]))
+                {
+                    word = "";
+                    digits.Add(currentLine[i]);
+                    break;
+                }
+                else
+                {
+                    bool wordFound = false;
+                    word = currentLine[i].ToString() + word;
+                    foreach (string key in wordToDigit.Keys)
+                    {
+                        if (!word.Contains(key))
+                            continue;
+                        wordFound = true;
+                        char value = wordToDigit[key];
+                        digits.Add(value);
+                        break;
+                    }
+                    if (wordFound)
+                        break;
+                }
+            }
+
+            return digits;
+        }
+
+        static private List<string> SplitString(string line, char separator = ' ')
+        {
+            List<string> strings = new();
+            string currentString = "";
+
+            foreach (char character in line)
+            {
+                if (character != separator)
+                    currentString += character.ToString();
+                else
+                {
+                    strings.Add(currentString);
+                    currentString = "";
+                } 
+            }
+
+            return strings;
         }
     }
 }
