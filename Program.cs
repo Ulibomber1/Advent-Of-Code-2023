@@ -12,12 +12,15 @@ namespace Advent_Of_Code_2023
         static void Main(string[] args)
         {
             string command;
-            string[] commandArgs = { };
+            List<string> commandArgs = new();
             Console.WriteLine("Welcome to the Advent of Code 2023 CLI!\n\n");
             bool isQuitting = false;
             while (!isQuitting)
             {
                 command = Console.ReadLine();
+                commandArgs = SplitString(command);
+                command = commandArgs[0];
+                commandArgs.RemoveAt(0);
 
                 switch (command)
                 {
@@ -29,14 +32,19 @@ namespace Advent_Of_Code_2023
                         isQuitting = true;
                         break;
                     case "/day1":
-                        Console.WriteLine("Please give the input file name: ");
-                        string fileName = Console.ReadLine();
-                        Console.WriteLine(Day1(fileName).ToString());
-                        break;  
+                        string fileName = commandArgs[1];
+                        Console.WriteLine($"\nCalibrating with file {fileName}...");
+                        Console.WriteLine($"\nCalibration value is {Day1(fileName)}!\n");
+                        break;
+                    case "/day2":
+                        Console.WriteLine("");
+                        break;
                     default:
                         Console.WriteLine($"Unknown command: '{command}'\n");
                         break;
                 }
+
+                commandArgs.Clear();
             }
         }
 
@@ -44,7 +52,6 @@ namespace Advent_Of_Code_2023
 
         static int Day1(string fileName)
         {
-            Console.WriteLine("\nCalibrating...\n");
             int checkSum = 0;
 
             //Step 1: Open Filestream
