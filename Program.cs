@@ -42,7 +42,7 @@ namespace Advent_Of_Code_2023
 
         static int Day1(string fileName)
         {
-            Console.WriteLine("\nCalibrating...");
+            Console.WriteLine("\nCalibrating...\n");
             int checkSum = 0;
             var wordToDigit = new Dictionary<string, char>
             {
@@ -71,35 +71,65 @@ namespace Advent_Of_Code_2023
                         string word = "";
                         List<char> digits = new List<char>();
                         digits.Clear();
+
+                        //Check for first occurence of a digit or digit word forwards and backwards
                         for (int i = 0; i < currentLine.Length; i++)
                         {
                             if (char.IsDigit(currentLine[i]))
                             {
                                 word = "";
                                 digits.Add(currentLine[i]);
+                                break;
                             }
                             else
                             {
+                                bool wordFound = false;
                                 word += currentLine[i].ToString();
                                 foreach (string key in wordToDigit.Keys)
                                 {
-                                    if (word.Length < 3)
-                                        break;
-                                    if (!word.Contains(key) || !foundKeys.Contains(key))
+                                    if (!word.Contains(key))
                                         continue;
-                                    word = "";
+                                    wordFound = true;
                                     char value = wordToDigit[key];
                                     digits.Add(value);
                                     break;
                                 }
-                            }
-                                
+                                if (wordFound)
+                                    break;
+                            }  
                         }
-
+                        word = "";
+                        for (int i = currentLine.Length-1; i > 0; i--)
+                        {
+                            if (char.IsDigit(currentLine[i]))
+                            {
+                                word = "";
+                                digits.Add(currentLine[i]);
+                                break;
+                            }
+                            else
+                            {
+                                bool wordFound = false;
+                                word = currentLine[i].ToString() + word;
+                                foreach (string key in wordToDigit.Keys)
+                                {
+                                    if (!word.Contains(key))
+                                        continue;
+                                    wordFound = true;
+                                    char value = wordToDigit[key];
+                                    digits.Add(value);
+                                    break;
+                                }
+                                if (wordFound)
+                                    break;
+                            }
+                        }
+                        
                         if (digits.Count == 0)
                             continue;
                         string numberString = digits[0].ToString() + digits[digits.Count - 1].ToString();
                         int currentNumber = int.Parse(numberString);
+                        Console.WriteLine($"Line: {currentLine}\nNumber String: {numberString}\nInteger: {currentNumber}\n");
                         checkSum += currentNumber;
                     }
                 }
