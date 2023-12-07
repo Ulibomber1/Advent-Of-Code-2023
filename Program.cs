@@ -32,12 +32,12 @@ namespace Advent_Of_Code_2023
                         isQuitting = true;
                         break;
                     case "/day1":
-                        string fileName = commandArgs[1];
-                        Console.WriteLine($"\nCalibrating with file {fileName}...");
-                        Console.WriteLine($"\nCalibration value is {Day1(fileName)}!\n");
+                        Console.WriteLine($"\nCalibrating with file {commandArgs[0]}...");
+                        Console.WriteLine($"\nCalibration value is: {Day1(commandArgs[0])}\n");
                         break;
                     case "/day2":
-                        Console.WriteLine("");
+                        Console.WriteLine($"\nFinding possible games in {commandArgs[0]}...");
+                        Console.WriteLine($"\nSum of possible game IDs: {Day2(commandArgs[0])}\n");
                         break;
                     default:
                         Console.WriteLine($"Unknown command: '{command}'\n");
@@ -78,6 +78,13 @@ namespace Advent_Of_Code_2023
                 }
             }
             //Step 3: Return the CheckSum
+            return checkSum;
+        }
+
+        static int Day2(string filename)
+        {
+            int checkSum = 0;
+
             return checkSum;
         }
 
