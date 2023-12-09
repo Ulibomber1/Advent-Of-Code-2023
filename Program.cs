@@ -84,7 +84,31 @@ namespace Advent_Of_Code_2023
         static int Day2(string filename)
         {
             int checkSum = 0;
+            // open file stream and start reader, start a while loop.
+            using (var fs = File.OpenRead(filename))
+            using (var reader = new StreamReader(fs))
+                while (!reader.EndOfStream)
+                {
+                    string currentLine = reader.ReadLine();
+                    List<string> idDataSplit = SplitString(currentLine, ':');
+                    int gameID = int.Parse(SplitString(idDataSplit[0])[1]);
+                    List<string> dataSplit = SplitString(idDataSplit[1], ';');
 
+                    Console.WriteLine($"\ncurrentLine: {currentLine}\nid: {gameID}\ndataSplit: {dataSplit}");
+
+                    List<Dictionary<string, int>> listOfSets;
+                    for (int i = 0; i < dataSplit.Count - 1; i++)
+                    {
+                        List<string> currentSubset = SplitString(dataSplit[i]);
+                        //string key 
+                    }
+                    
+                }
+                // split line into game ID and data, then split the ID from the word 'game' as {ID : list of subsets}
+                // Split the data into subsets, and each subset is a dictionary with {color : # of color}
+                // Test if any subset contains more than the known maximum # of each color,
+                // If any subset has more of any color, continue while loop (impossible game)
+                // If the subsets pass: add associated game ID to the check sum, print out that Game {ID} is possible 
             return checkSum;
         }
 
