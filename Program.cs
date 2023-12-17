@@ -12,7 +12,7 @@ namespace Advent_Of_Code_2023
         static void Main(string[] args)
         {
             string command;
-            List<string> commandArgs = new();
+            List<string> commandArgs;
             Console.WriteLine("Welcome to the Advent of Code 2023 CLI!\n\n");
             bool isQuitting = false;
             while (!isQuitting)
@@ -21,6 +21,8 @@ namespace Advent_Of_Code_2023
                 commandArgs = SplitString(command);
                 command = commandArgs[0];
                 commandArgs.RemoveAt(0);
+
+                Console.WriteLine($"commandArgs: {commandArgs.Count}");
 
                 switch (command)
                 {
@@ -84,30 +86,59 @@ namespace Advent_Of_Code_2023
         static int Day2(string filename)
         {
             int checkSum = 0;
+            Dictionary<string, int> possibleColorsMax = new Dictionary<string, int>{ { "red", 12 }, { "green", 13 }, { "blue", 14 } };
+
             // open file stream and start reader, start a while loop.
             using (var fs = File.OpenRead(filename))
             using (var reader = new StreamReader(fs))
                 while (!reader.EndOfStream)
                 {
+                    // Split line into game ID and data, then split the ID from the word 'game' as {ID : list of subsets}
                     string currentLine = reader.ReadLine();
                     List<string> idDataSplit = SplitString(currentLine, ':');
                     int gameID = int.Parse(SplitString(idDataSplit[0])[1]);
                     List<string> dataSplit = SplitString(idDataSplit[1], ';');
 
-                    Console.WriteLine($"\ncurrentLine: {currentLine}\nid: {gameID}\ndataSplit: {dataSplit}");
-
-                    List<Dictionary<string, int>> listOfSets;
-                    for (int i = 0; i < dataSplit.Count - 1; i++)
+                    // Split the data into subsets, and each subset is a dictionary with {color : # of color}
+                    List<Dictionary<string, int>> listOfSets = new();
+                    for (int i = 0; i < dataSplit.Count; i++)
                     {
-                        List<string> currentSubset = SplitString(dataSplit[i]);
-                        //string key 
+                        List<string> currentSubset = SplitString(dataSplit[i].Trim(), ',');
+                        Dictionary<string, int> currentSubsetDict = new();
+                        for (int j  = 0; j < currentSubset.Count; j++)
+                        {
+                            List<string> splitSubset = SplitString(currentSubset[j].Trim());
+                            string key = splitSubset[1];
+                            int value = int.Parse(splitSubset[0]);
+                            currentSubsetDict.Add(key, value);
+                        }
+                        listOfSets.Add(currentSubsetDict);
                     }
-                    
+
+                    bool possibleGame = true;
+                    foreach (var dict in listOfSets)
+                    {
+                        foreach (var color in possibleColorsMax.Keys)
+                        {
+                            if (!dict.ContainsKey(color))
+                                continue;
+                            if (dict[color] > possibleColorsMax[color])
+                            {
+                                possibleGame = false;
+                                break;
+                            }
+                        }
+                        if (!possibleGame)
+                            break;
+                    }
+                    if (possibleGame)
+                    {
+                        Console.WriteLine($"\nCURRENT LINE: {currentLine}\nGame {gameID} is possible!");
+                        checkSum += gameID;
+                    }
                 }
-                // split line into game ID and data, then split the ID from the word 'game' as {ID : list of subsets}
-                // Split the data into subsets, and each subset is a dictionary with {color : # of color}
                 // Test if any subset contains more than the known maximum # of each color,
-                // If any subset has more of any color, continue while loop (impossible game)
+                // If any subset has more of any color's max, do nothing and continue while loop (impossible game)
                 // If the subsets pass: add associated game ID to the check sum, print out that Game {ID} is possible 
             return checkSum;
         }
@@ -191,15 +222,15 @@ namespace Advent_Of_Code_2023
             List<string> strings = new();
             string currentString = "";
 
-            foreach (char character in line)
+            for (int index = 0; index < line.Length; index++)
             {
-                if (character != separator)
-                    currentString += character.ToString();
-                else
+                if (line[index] != separator)
+                    currentString += line[index].ToString();
+                if (line[index] == separator || index == line.Length - 1)
                 {
                     strings.Add(currentString);
                     currentString = "";
-                } 
+                }    
             }
 
             return strings;
