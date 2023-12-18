@@ -24,7 +24,6 @@ namespace Advent_Of_Code_2023
                 commandArgs.RemoveAt(0);
 
                 Console.WriteLine($"commandArgs: {commandArgs.Count}");
-
                 switch (command)
                 {
                     case "/help":
@@ -40,8 +39,13 @@ namespace Advent_Of_Code_2023
                         break;
                     case "/day2":
                         Console.WriteLine($"\nFinding possible games in {commandArgs[0]}...");
-                        int[] result = Day2(commandArgs[0]);
-                        Console.WriteLine($"\nSum of possible game IDs: {result[0]}\nSum of games' cube powers: {result[1]}\n");
+                        int[] resultD2 = Day2(commandArgs[0]);
+                        Console.WriteLine($"\nSum of possible game IDs: {resultD2[0]}\nSum of games' cube powers: {resultD2[1]}\n");
+                        break;
+                    case "/day3":
+                        Console.WriteLine($"\nFinding part numbers in {commandArgs[0]}...");
+                        int resultD3 = Day3(commandArgs[0]);
+                        Console.WriteLine($"\nSum of part numbers: {resultD3}");
                         break;
                     default:
                         Console.WriteLine($"Unknown command: '{command}'\n");
@@ -164,6 +168,20 @@ namespace Advent_Of_Code_2023
 
             int[] sumList = { checkSum, powerSum };
             return sumList;
+        }
+
+        static int Day3(string filename)
+        {
+            int checkSum = 0;
+
+            using (var fs = File.OpenRead(filename))
+            using (var reader = new StreamReader(fs))
+                while (!reader.EndOfStream)
+                {
+                    
+                }
+
+            return checkSum;
         }
 
         static private List<char> FindAllDigits(string currentLine)
