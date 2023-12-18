@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -39,7 +40,8 @@ namespace Advent_Of_Code_2023
                         break;
                     case "/day2":
                         Console.WriteLine($"\nFinding possible games in {commandArgs[0]}...");
-                        Console.WriteLine($"\nSum of possible game IDs: {Day2(commandArgs[0])}\n");
+                        int[] result = Day2(commandArgs[0]);
+                        Console.WriteLine($"\nSum of possible game IDs: {result[0]}\nSum of games' cube powers: {result[1]}\n");
                         break;
                     default:
                         Console.WriteLine($"Unknown command: '{command}'\n");
@@ -49,7 +51,6 @@ namespace Advent_Of_Code_2023
                 commandArgs.Clear();
             }
         }
-
 
 
         static int Day1(string fileName)
@@ -83,9 +84,10 @@ namespace Advent_Of_Code_2023
             return checkSum;
         }
 
-        static int Day2(string filename)
+        static int[] Day2(string filename)
         {
             int checkSum = 0;
+            int powerSum = 0;
             Dictionary<string, int> possibleColorsMax = new Dictionary<string, int>{ { "red", 12 }, { "green", 13 }, { "blue", 14 } };
 
             // open file stream and start reader, start a while loop.
@@ -97,6 +99,8 @@ namespace Advent_Of_Code_2023
                     string currentLine = reader.ReadLine();
                     List<string> idDataSplit = SplitString(currentLine, ':');
                     int gameID = int.Parse(SplitString(idDataSplit[0])[1]);
+                    int minGreen, minRed, minBlue;
+                    minGreen = minRed = minBlue = int.MinValue;
                     List<string> dataSplit = SplitString(idDataSplit[1], ';');
 
                     // Split the data into subsets, and each subset is a dictionary with {color : # of color}
@@ -115,6 +119,7 @@ namespace Advent_Of_Code_2023
                         listOfSets.Add(currentSubsetDict);
                     }
 
+                    // Test if any subset contains more than the known maximum # of each color
                     bool possibleGame = true;
                     foreach (var dict in listOfSets)
                     {
@@ -122,25 +127,43 @@ namespace Advent_Of_Code_2023
                         {
                             if (!dict.ContainsKey(color))
                                 continue;
-                            if (dict[color] > possibleColorsMax[color])
+                            switch (color)
                             {
-                                possibleGame = false;
-                                break;
+                                case "red":
+                                    if (dict[color] > minRed)
+                                        minRed = dict[color];
+                                    break;
+                                case "green":
+                                    if (dict[color] > minGreen)
+                                        minGreen = dict[color];
+                                    break;
+                                case "blue":
+                                    if (dict[color] > minBlue)
+                                        minBlue = dict[color];
+                                    break;
                             }
+                            if (dict[color] > possibleColorsMax[color])
+                                possibleGame = false;
                         }
-                        if (!possibleGame)
-                            break;
                     }
+
+                    // If the subsets pass: add associated game ID to the check sum, print out that Game {ID} is possible 
                     if (possibleGame)
                     {
                         Console.WriteLine($"\nCURRENT LINE: {currentLine}\nGame {gameID} is possible!");
                         checkSum += gameID;
                     }
+
+                    // Add the power of the current game's cubes to the power sum
+                    if (minBlue == int.MinValue) minBlue = 1;
+                    if (minGreen == int.MinValue) minGreen = 1;
+                    if (minRed == int.MinValue) minRed = 1;
+                    int cubePower = minRed * minGreen * minBlue;
+                    powerSum += cubePower;
                 }
-                // Test if any subset contains more than the known maximum # of each color,
-                // If any subset has more of any color's max, do nothing and continue while loop (impossible game)
-                // If the subsets pass: add associated game ID to the check sum, print out that Game {ID} is possible 
-            return checkSum;
+
+            int[] sumList = { checkSum, powerSum };
+            return sumList;
         }
 
         static private List<char> FindAllDigits(string currentLine)
