@@ -174,14 +174,60 @@ namespace Advent_Of_Code_2023
         {
             int checkSum = 0;
 
+            int rowLength = 0;
+            char sep = '.';
+            List<string> rows = new();
+            List<char[]> charMatrix = new();
+            List<int> partNums = new();
+
             using (var fs = File.OpenRead(filename))
             using (var reader = new StreamReader(fs))
                 while (!reader.EndOfStream)
                 {
-                    
+                    rows.Add(reader.ReadLine());
                 }
 
+            rowLength = rows[0].Length;
+            foreach (string row in rows)
+            {
+                char[] currentRow = row.ToCharArray();
+                charMatrix.Add(currentRow);
+            }
+            
+            for (int i = 0; i < charMatrix.Count - 1; i++)
+            {
+                string numString = "";
+                for (int j = 0; j < rowLength - 1; j++)
+                {
+                    
+                    if (char.IsDigit(charMatrix[i][j]))
+                    {
+                        numString += charMatrix[i][j];
+                        continue;
+                    }
+                    else if (charMatrix[i][j] == sep)
+                    {
+
+                        numString = "";
+                        continue;
+                    }
+                    else
+                    {
+
+                    }
+
+                }
+            }
+
             return checkSum;
+        }
+
+        static private bool IsPartNumber(List<char[]> matrix, int i, int j)
+        {
+            bool isTrue = false;
+            List<Tuple<int, int>> directions = new({0,1});
+
+            return isTrue;
         }
 
         static private List<char> FindAllDigits(string currentLine)
