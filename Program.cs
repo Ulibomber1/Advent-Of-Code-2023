@@ -176,9 +176,9 @@ namespace Advent_Of_Code_2023
 
             int rowLength = 0;
             char sep = '.';
+            var directions = new List<(int, int)> { (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1), (0,1), (1,1) };
             List<string> rows = new();
             List<char[]> charMatrix = new();
-            List<int> partNums = new();
 
             using (var fs = File.OpenRead(filename))
             using (var reader = new StreamReader(fs))
@@ -193,29 +193,48 @@ namespace Advent_Of_Code_2023
                 char[] currentRow = row.ToCharArray();
                 charMatrix.Add(currentRow);
             }
-            
-            for (int i = 0; i < charMatrix.Count - 1; i++)
+
+            int numPosition = 0;
+            bool endOfNum = true;
+            for (int i = 0; i < charMatrix.Count; i++)
             {
                 string numString = "";
-                for (int j = 0; j < rowLength - 1; j++)
+                for (int j = 0; j < rowLength; j++)
                 {
                     
                     if (char.IsDigit(charMatrix[i][j]))
                     {
+                        if (endOfNum)
+                        {
+                            endOfNum = false;
+                            numPosition = j;
+                        }
                         numString += charMatrix[i][j];
-                        continue;
                     }
-                    else if (charMatrix[i][j] == sep)
+                    else if (charMatrix[i][j] == sep || j == rowLength - 1)
                     {
-
+                        endOfNum = true;
+                        while (numPosition < j)
+                        {
+                            foreach ((int, int) dir in directions)
+                            {
+                                char currentCharacter = ' ';
+                                try { currentCharacter = charMatrix[i + dir.Item2][numPosition + dir.Item1]; }
+                                catch (ArgumentOutOfRangeException) { continue; }
+                                catch (IndexOutOfRangeException) { continue; }
+                                    
+                                if (currentCharacter != sep && !char.IsDigit(currentCharacter) && numString != "")
+                                {
+                                    Console.WriteLine($"\nFound part number {numString} at line {i}, character {j}.");
+                                    checkSum += int.Parse(numString);
+                                    numPosition = j;
+                                    break;
+                                }
+                            }
+                            numPosition++;
+                        }
                         numString = "";
-                        continue;
                     }
-                    else
-                    {
-
-                    }
-
                 }
             }
 
@@ -225,7 +244,7 @@ namespace Advent_Of_Code_2023
         static private bool IsPartNumber(List<char[]> matrix, int i, int j)
         {
             bool isTrue = false;
-            List<Tuple<int, int>> directions = new({0,1});
+            //List<Tuple<int, int>> directions = new({0,1});
 
             return isTrue;
         }
