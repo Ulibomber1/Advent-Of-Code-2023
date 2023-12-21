@@ -174,7 +174,7 @@ namespace Advent_Of_Code_2023
         {
             int checkSum = 0;
 
-            int rowLength = 0;
+            int rowLength;
             char sep = '.';
             var directions = new List<(int, int)> { (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1), (0,1), (1,1) };
             List<string> rows = new();
@@ -211,7 +211,7 @@ namespace Advent_Of_Code_2023
                         }
                         numString += charMatrix[i][j];
                     }
-                    else if (charMatrix[i][j] == sep || j == rowLength - 1)
+                    if ((!char.IsDigit(charMatrix[i][j]) || j+1 == rowLength) && numString != "")
                     {
                         endOfNum = true;
                         while (numPosition < j)
